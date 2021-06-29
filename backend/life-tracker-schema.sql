@@ -8,11 +8,3 @@ CREATE TABLE users (
   is_admin    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at  TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
-CREATE TABLE nutrition (
-    calories        INTEGER NOT NULL,
-    portion         INTEGER NOT NULL,
-    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
-    food            TEXT NOT NULL,
-    category        TEXT NOT NULL
-)
