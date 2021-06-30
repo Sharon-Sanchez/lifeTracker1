@@ -1,16 +1,38 @@
-const { UnauthorizedError, BadRequestError } = require("../utils/errors")
+const bcrypt = require("bcrypt")
 const db = require("../db")
+const { BCRYPT_WORK_FACTOR } = require("../config")
+const { UnauthorizedError, BadRequestError } = require("../utils/errors")
 class User {
+    static makePublicUser(user) {
+        return {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          isAdmin: user.is_admin,
+          createdAt: user.created_at,
+        }
+      }
+
+
     static async login(credentials) {
-        // user should submit their email and password
-        // if any of these fields are missing, throw an error
-        //
-        // lookup the user in the db by email
-        // with pass in db
-        //if there is a match
-        //
-        // if any of this goes wrong, throw an error
-        throw new UnauthorizedError("Invalid email/password")
+        const requiredFields = ["username", "password"]
+        requiredFields.forEach((property) => {
+            if (!credentials?.hasOwnProperty(property)) {
+                throw new BadRequestError(`Missing ${property} in request body.`)
+            }
+        })
+
+        const user = await User.fetchUserByUsername(credentials.username)
+        if (user) {
+            const isValid = await bcrypt.compare(credentials.password, user.password)
+            if (isValid) {
+              return User.makePublicUser(user)
+            }
+        }
+
+        throw new UnauthorizedError("Invalid Username/password")
     }
 
     static async register(credentials) {
@@ -35,6 +57,7 @@ class User {
           throw new BadRequestError(`A user already exists with username: ${credentials.username}`)
         }
 
+        const hashedPassword = await bcrypt.hash(credentials.password, BCRYPT_WORK_FACTOR)
         const normalizedEmail = credentials.email.toLowerCase()
         const normalizedUsername = credentials.username.toLowerCase()
 
@@ -49,13 +72,13 @@ class User {
               normalizedUsername,
               credentials.firstName,
               credentials.lastName,
-              credentials.password,
+              hashedPassword,
               credentials.isAdmin
               
             ]
         )
         const user = userResult.rows[0]
-        return user
+        return User.makePublicUser(user)
 
     }
 
