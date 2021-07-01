@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt")
 const db = require("../db")
 const { BCRYPT_WORK_FACTOR } = require("../config")
 const { UnauthorizedError, BadRequestError } = require("../utils/errors")
+
 class User {
     static makePublicUser(user) {
         return {
@@ -10,7 +11,6 @@ class User {
           username: user.username,
           firstName: user.first_name,
           lastName: user.last_name,
-          isAdmin: user.is_admin,
           createdAt: user.created_at,
         }
       }
@@ -36,7 +36,7 @@ class User {
     }
 
     static async register(credentials) {
-        const requiredFields = ["email", "username", "firstName", "lastName", "password", "isAdmin"]
+        const requiredFields = ["email", "username", "firstName", "lastName", "password"]
         requiredFields.forEach((property) => {
             if (!credentials?.hasOwnProperty(property)) {
               throw new BadRequestError(`Missing ${property} in request body.`)
@@ -63,17 +63,16 @@ class User {
 
 
         const userResult = await db.query(
-            `INSERT INTO users (email, username, first_name, last_name, password, is_admin)
-             VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING id, email, username, first_name, last_name, is_admin, created_at;
+            `INSERT INTO users (email, username, first_name, last_name, password)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING id, email, username, first_name, last_name, created_at;
             `,
             [
               normalizedEmail,
               normalizedUsername,
               credentials.firstName,
               credentials.lastName,
-              hashedPassword,
-              credentials.isAdmin
+              hashedPassword
               
             ]
         )
