@@ -9,19 +9,14 @@ CREATE TABLE users (
 );
 
 CREATE TABLE nutrition (
-  id          SERIAL PRIMARY KEY,
-  food_name   TEXT NOT NULL,
-  calories    INT NOT NULL,
-  categories  TEXT NOT NULL,
-  image       TEXT NOT NULL,
-  servings    INT NOT NULL ,
-  created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-  user_id     INT NOT NULL,
+  id              SERIAL PRIMARY KEY,
+  food_name       TEXT NOT NULL,
+  calories        INT NOT NULL,
+  category        TEXT NOT NULL,
+  serving_size    INT NOT NULL ,
+  user_id         INT NOT NULL,
+  created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE userFeed (
-  user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  profile_pic   TEXT NOT NULL
-);

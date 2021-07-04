@@ -2,6 +2,7 @@ require("dotenv").config()
 require("colors")
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001
+const SECRET_KEY = process.env.SECRET_KEY || "secret_dev"
 
 const IS_TESTING = process.env.NODE_ENV === "test"
 
@@ -21,6 +22,7 @@ const BCRYPT_WORK_FACTOR = IS_TESTING ? 1 : 13
 
 console.log("Life tracker config:".red)
 console.log("PORT:".blue, PORT)
+console.log("SECRET_KEY:".blue, SECRET_KEY)
 console.log("database URI:".blue, getDatabaseUri())
 console.log("-----")
 
